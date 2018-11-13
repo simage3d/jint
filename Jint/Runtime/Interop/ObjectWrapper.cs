@@ -116,7 +116,7 @@ namespace Jint.Runtime.Interop
 
             if (methods?.Count > 0)
             {
-                return (engine, target) => new PropertyDescriptor(new MethodInfoFunctionInstance(engine, methods.ToArray()), PropertyFlag.OnlyEnumerable);
+                return (engine, target) => new PropertyDescriptor(new MethodInfoFunctionInstance(engine, methods.ToArray(), type.Name + "." + propertyName), PropertyFlag.OnlyEnumerable);
             }
 
             // if no methods are found check if target implemented indexing
@@ -170,7 +170,7 @@ namespace Jint.Runtime.Interop
 
             if (explicitMethods?.Count > 0)
             {
-                return (engine, target) => new PropertyDescriptor(new MethodInfoFunctionInstance(engine, explicitMethods.ToArray()), PropertyFlag.OnlyEnumerable);
+                return (engine, target) => new PropertyDescriptor(new MethodInfoFunctionInstance(engine, explicitMethods.ToArray(), type.Name + "." + propertyName), PropertyFlag.OnlyEnumerable);
             }
 
             // try to find explicit indexer implementations

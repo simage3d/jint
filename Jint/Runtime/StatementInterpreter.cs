@@ -279,6 +279,75 @@ namespace Jint.Runtime
             return new Completion(CompletionType.Normal, v, null);
         }
 
+        public Completion ExecuteForOfStatement(ForOfStatement forOfStatement)
+        {
+            var identifier = forOfStatement.Left.Type == Nodes.VariableDeclaration
+                ? (Identifier)((VariableDeclaration)forOfStatement.Left).Declarations[0].Id
+                : (Identifier)forOfStatement.Left;
+
+            var varRef = _engine.EvaluateExpression(identifier) as Reference;
+            var experValue = _engine.GetValue(_engine.EvaluateExpression(forOfStatement.Right), true);
+            if (experValue.IsUndefined() || experValue.IsNull())
+            {
+                return new Completion(CompletionType.Normal, null, null);
+            }
+
+            JsValue v = Null.Instance;
+
+            System.Collections.IEnumerator enumerator = null;
+
+
+            if (experValue is Native.Array.ArrayInstance array)
+            {
+                enumerator = array.GetEnumerator();
+            }
+            else if (experValue is JsString str)
+            {
+                enumerator = str.ToString().GetEnumerator();
+            }
+            else if (experValue is Native.Map.MapInstance map)
+            {
+                enumerator = map._map.Values.GetEnumerator();
+            }
+            else if (experValue is Native.Set.SetInstance s)
+            {
+                enumerator = s._set._list.GetEnumerator();
+            }
+            else if (experValue is Jint.Runtime.Interop.ObjectWrapper wrapper && wrapper.Target is System.Collections.IEnumerable enumerable)
+            {
+                enumerator = enumerable.GetEnumerator();
+            }
+
+            if (enumerator != null)
+            {
+                while (enumerator.MoveNext())
+                {
+                    JsValue p = JsValue.FromObject(_engine, enumerator.Current);
+
+                    _engine.PutValue(varRef, p);
+
+                    var stmt = _engine.ExecuteStatement(forOfStatement.Body);
+                    if (!ReferenceEquals(stmt.Value, null))
+                    {
+                        v = stmt.Value;
+                    }
+                    if (stmt.Type == CompletionType.Break)
+                    {
+                        return new Completion(CompletionType.Normal, v, null);
+                    }
+                    if (stmt.Type != CompletionType.Continue)
+                    {
+                        if (stmt.Type != CompletionType.Normal)
+                        {
+                            return stmt;
+                        }
+                    }
+                }
+            }
+
+            return new Completion(CompletionType.Normal, v, null);
+        }
+
         /// <summary>
         /// http://www.ecma-international.org/ecma-262/5.1/#sec-12.7
         /// </summary>

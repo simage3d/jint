@@ -90,7 +90,7 @@ namespace Jint.Runtime.Interop
                 }
             }
 
-            ExceptionHelper.ThrowTypeError(_engine, "No public methods with the specified arguments were found.");
+            ExceptionHelper.ThrowTypeError(_engine, "No public constructor methods with the specified arguments were found : " + ReferenceType.Name);
             return null;
         }
 
@@ -201,7 +201,7 @@ namespace Jint.Runtime.Interop
                 return PropertyDescriptor.Undefined;
             }
 
-            return new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, methodInfo.ToArray()), PropertyFlag.AllForbidden);
+            return new PropertyDescriptor(new MethodInfoFunctionInstance(Engine, methodInfo.ToArray(), ReferenceType.Name + "." + propertyName), PropertyFlag.AllForbidden);
         }
 
         public object Target => ReferenceType;

@@ -11,10 +11,13 @@ namespace Jint.Runtime.Interop
     {
         private readonly MethodInfo[] _methods;
 
-        public MethodInfoFunctionInstance(Engine engine, MethodInfo[] methods)
+        public string Name { get; set; }
+
+        public MethodInfoFunctionInstance(Engine engine, MethodInfo[] methods, string name)
             : base(engine, "Function", null, null, false)
         {
             _methods = methods;
+            Name = name;
             Prototype = engine.Function.PrototypeObject;
         }
 
@@ -94,7 +97,7 @@ namespace Jint.Runtime.Interop
                 }
             }
 
-            ExceptionHelper.ThrowTypeError(_engine, "No public methods with the specified arguments were found.");
+            ExceptionHelper.ThrowTypeError(_engine, "No public methods with the specified arguments were found : " + Name);
             return null;
         }
 

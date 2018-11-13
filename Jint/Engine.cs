@@ -507,6 +507,9 @@ namespace Jint
                 case Nodes.ForInStatement:
                     return _statements.ExecuteForInStatement((ForInStatement) statement);
 
+                case Nodes.ForOfStatement:
+                    return _statements.ExecuteForOfStatement((ForOfStatement)statement);
+
                 case Nodes.IfStatement:
                     return _statements.ExecuteIfStatement((IfStatement) statement);
 
